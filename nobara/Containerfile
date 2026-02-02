@@ -1,0 +1,29 @@
+FROM fedora:latest
+
+RUN dnf update && dnf install -y \
+    @development-tools \
+    ncurses-devel \
+    bison \
+    flex \
+    elfutils-libelf-devel \
+    openssl-devel \
+    dwarves \
+    bc \
+    perl \
+    python3-docutils \
+    rsync \
+    git \
+    gcc-c++ \
+    make \
+    rpm-build \
+    rpmdevtools \
+    redhat-rpm-config
+
+RUN dnf install -y \
+    sudo \
+    wget
+
+RUN useradd -m build -u 1000 -g 1000 && echo "build ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/build
+USER build
+WORKDIR /workspaces
+ENTRYPOINT ["/bin/bash"]
