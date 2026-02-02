@@ -15,4 +15,4 @@ jobs:
 
             - name: Set up rpmbuild
               run: |
-                  dnf builddep nobara/kernel.spec
+                  dnf -y builddep nobara/kernel.spec
