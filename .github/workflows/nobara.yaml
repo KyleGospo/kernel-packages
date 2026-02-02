@@ -1,4 +1,4 @@
-name: Build (Fedora)
+name: Build (Nobara)
 
 on:
     workflow_dispatch:
