@@ -29,7 +29,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  pacman -Syu --noconfirm bc cpio gettext libelf pahole perl python rust rust-bindget rust-src tar xz
+                  pacman -Syu --noconfirm bc cpio gettext libelf pahole perl python rust rust-bindgen rust-src tar xz
 
             - name: Build linux package
               id: build-kernel-package
