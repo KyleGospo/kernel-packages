@@ -20,4 +20,5 @@ jobs:
                   dnf -y builddep nobara/kernel.spec
             - name: build
               run: |
+                  id
                   rpmbuild --define "_topdir `pwd`" -ba ./nobara/kernel.spec
