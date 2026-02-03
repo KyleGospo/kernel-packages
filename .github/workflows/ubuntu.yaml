@@ -20,7 +20,7 @@ jobs:
                   export DEBIAN_FRONTEND=noninteractive
                   apt-get update -y
                   apt-get install -y build-essential devscripts debhelper dh-python asciidoc-base bc bison cpio dwarves flex kmod libdw-dev libiberty-dev libnuma-dev  libslang2-dev lz4 rsync wget xmlto git
-                  apt-get install -y libunwind-dev libpfm4-dev coccinelle openjdk-17-jdk libcapstone-dev libbabeltrace-dev systemtap-sdt-dev libzstd-dev dwarves zstd libbfd-dev libperl-dev
+                  apt-get install -y libunwind-dev libpfm4-dev coccinelle openjdk-17-jdk libcapstone-dev libbabeltrace-dev systemtap-sdt-dev libzstd-dev dwarves zstd libbfd-dev libperl-dev libssl-dev
             - name: Get sources
               run: |
                   wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.tar.xz
@@ -28,4 +28,4 @@ jobs:
                   cd linux-6.18
                   cp ../ubuntu/config .config
                   make olddefconfig
-                  fakeroot make -j$(nproc) deb-pkg
+                  fakeroot make -j$(nproc) bindeb-pkg
