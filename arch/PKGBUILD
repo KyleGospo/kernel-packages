@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.18.7.OGC1
+pkgver=6.18.7.ogc2
 pkgrel=1
 pkgdesc='Linux'
 url='https://github.com/BoukeHaarsma23/linux-ogc'
