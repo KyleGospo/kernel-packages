@@ -4,7 +4,7 @@ pkgbase=linux
 pkgver=6.18.7.arch1
 pkgrel=1
 pkgdesc='Linux'
-url='https://github.com/archlinux/linux'
+url='https://github.com/boukehaarsma23/linux-ogc'
 arch=(x86_64)
 license=(GPL-2.0-only)
 makedepends=(
@@ -36,7 +36,7 @@ _srcname=linux-${pkgver%.*}
 _srctag=v${pkgver%.*}-${pkgver##*.}
 source=(
   https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  $url/releases/download/$_srctag/linux-$_srctag.patch.zst{,.sig}
+  $url/releases/download/OGC/v${pkgver%.*}/monolitic.patch{,.sig}
   config  # the main kernel config file
 )
 validpgpkeys=(
