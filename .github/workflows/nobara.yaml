@@ -23,6 +23,6 @@ jobs:
                   TOPDIR="$(pwd)/rpmbuild"
 
                   mkdir -p "$TOPDIR"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-                  cp nobara/*.patch $TOPDIR/SOURCES
+                  cp nobara/* $TOPDIR/SOURCES
 
                   rpmbuild --define "_topdir $TOPDIR" -ba ./nobara/kernel.spec

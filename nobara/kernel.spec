@@ -35,7 +35,7 @@
 %endif
 
 Name: kernel
-Summary: The Linux Kernel with Cachyos and Nobara Patches
+Summary: The Linux Kernel with Open Gaming Collective (OGC) patches
 
 %define _basekver 6.18
 %define _stablekver 7
@@ -70,14 +70,9 @@ Release:%{customver}.nobara%{?dist}
 License: GPLv2 and Redistributable, no modifications permitted
 Group: System Environment/Kernel
 Vendor: The Linux Community and CachyOS maintainer(s)
-URL: https://cachyos.org
+URL: https://opengamingcollective.org
 Source0: https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-%{_tarkver}.tar.xz
-%if 0%{?_is_rc}
-Source1: https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos-rc/config
-%else
-Source1: https://raw.githubusercontent.com/CachyOS/linux-cachyos/master/linux-cachyos/config
-%endif
-
+Source1: config
 # needed for kernel-tools
 Source2: kvm_stat.logrotate
 
@@ -85,40 +80,7 @@ Source2: kvm_stat.logrotate
 ExcludeArch:    %{ix86}
 
 # Stable patches
-Patch0: https://raw.githubusercontent.com/CachyOS/kernel-patches/master/%{_basekver}/all/0001-cachyos-base-all.patch
-Patch1: https://raw.githubusercontent.com/CachyOS/kernel-patches/master/%{_basekver}/sched/0001-bore-cachy.patch
-# For handhelds
-Patch2: https://raw.githubusercontent.com/CachyOS/kernel-patches/master/%{_basekver}/misc/0001-handheld.patch
-
-# Nobara
-#surface
-Patch3: linux-surface.patch
-# rog ally/x
-Patch4: ROG-ALLY-NCT6775-PLATFORM.patch
-# Logitech wheel
-Patch5: ps-logitech-wheel.patch
-# fixes framerate control in gamescope
-Patch6: valve-gamescope-framerate-control-fixups.patch
-# fixes orientation on SuiPlay0X1
-Patch7: suiplay0x1-orientation-quirk.patch
-
-# temporary patches
-# fixes HAINAN amdgpu card not being bootable
-# https://gitlab.freedesktop.org/drm/amd/-/issues/1839
-Patch8: amdgpu-HAINAN-variant-fixup.patch
-# Allow to set custom USB pollrate for specific devices like so:
-# usbcore.interrupt_interval_override=045e:00db:16,1bcf:0005:1
-# useful for setting polling rate of wired PS4/PS5 controller to 1000Hz
-# https://github.com/KarsMulder/Linux-Pollrate-Patch
-# https://gitlab.com/GloriousEggroll/nobara-images/-/issues/64
-Patch9: 0001-Allow-to-set-custom-USB-pollrate-for-specific-device.patch
-# Add xpadneo as patch instead of using dkms module
-Patch10: 0001-Add-xpadneo-bluetooth-hid-driver-module.patch
-
-# aarch64 patches
-Patch20: 0001-ampere-arm64-Add-a-fixup-handler-for-alignment-fault.patch
-Patch21: 0002-ampere-arm64-Work-around-Ampere-Altra-erratum-82288-.patch
-Patch22: xe-nonx86.patch
+Patch0: https://github.com/BoukeHaarsma23/linux-ogc/releases/download/v6.18.7-OGC1/monolithic.patch
 
 %define __spec_install_post /usr/lib/rpm/brp-compress || :
 %define debug_package %{nil}
@@ -408,102 +370,11 @@ analysing the logical and timing behavior of Linux.
 %prep
 %setup -q -n linux-%{_tarkver}
 
-# Apply CachyOS patch
+# Apply OGC patch
 patch -p1 -i %{PATCH0}
-
-# Apply EEVDF and BORE patches
-patch -p1 -i %{PATCH1}
-
-# Apply Nobara patches:
-patch -p1 -i %{PATCH2}
-patch -p1 -i %{PATCH3}
-patch -p1 -i %{PATCH4}
-patch -p1 -i %{PATCH5}
-patch -p1 -i %{PATCH6}
-patch -p1 -i %{PATCH7}
-patch -p1 -i %{PATCH8}
-patch -p1 -i %{PATCH9}
-patch -p1 -i %{PATCH10}
-
-# Apply aarch64 patches
-patch -p1 -i %{PATCH20}
-patch -p1 -i %{PATCH21}
-patch -p1 -i %{PATCH22}
 
 # Fetch the config and move it to the proper directory
 cp %{SOURCE1} .config
-
-# Remove CachyOS's localversion
-find . -name "localversion*" -delete
-scripts/config -u LOCALVERSION
-
-# Enable CachyOS tweaks
-scripts/config -e CACHY
-
-# Enable BORE Scheduler
-scripts/config -e SCHED_BORE
-
-# Enable sched-ext
-scripts/config -e SCHED_CLASS_EXT
-scripts/config -e BPF
-scripts/config -e BPF_EVENTS
-scripts/config -e BPF_JIT
-scripts/config -e BPF_SYSCALL
-scripts/config -e DEBUG_INFO
-scripts/config -e DEBUG_INFO_BTF
-scripts/config -e DEBUG_INFO_BTF_MODULES
-scripts/config -e FTRACE
-scripts/config -e PAHOLE_HAS_SPLIT_BTF
-scripts/config -e DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
-scripts/config -e SCHED_DEBUG
-
-# Setting tick rate
-scripts/config -d HZ_300
-scripts/config -e HZ_1000
-scripts/config --set-val HZ 1000
-
-# Enable x86_64_v3
-# Just to be sure, check:
-# /lib/ld-linux-x86-64.so.2 --help | grep supported
-# and make sure if your processor supports it:
-# x86-64-v3 (supported, searched)
-#scripts/config --set-val X86_64_VERSION 3
-
-# Set O3
-scripts/config -d CC_OPTIMIZE_FOR_PERFORMANCE
-scripts/config -e CC_OPTIMIZE_FOR_PERFORMANCE_O3
-
-# Enable full ticks
-scripts/config -d HZ_PERIODIC
-scripts/config -d NO_HZ_IDLE
-scripts/config -d CONTEXT_TRACKING_FORCE
-scripts/config -e NO_HZ_FULL_NODEF
-scripts/config -e NO_HZ_FULL
-scripts/config -e NO_HZ
-scripts/config -e NO_HZ_COMMON
-scripts/config -e CONTEXT_TRACKING
-
-# Enable full preempt
-scripts/config -e PREEMPT_BUILD
-scripts/config -d PREEMPT_NONE
-scripts/config -d PREEMPT_VOLUNTARY
-scripts/config -e PREEMPT
-scripts/config -e PREEMPT_COUNT
-scripts/config -e PREEMPTION
-scripts/config -e PREEMPT_DYNAMIC
-
-# Enable thin lto
-%if %{llvm_kbuild}
-scripts/config -e LTO
-scripts/config -e LTO_CLANG
-scripts/config -e ARCH_SUPPORTS_LTO_CLANG
-scripts/config -e ARCH_SUPPORTS_LTO_CLANG_THIN
-scripts/config -d LTO_NONE
-scripts/config -e HAS_LTO_CLANG
-scripts/config -d LTO_CLANG_FULL
-scripts/config -e LTO_CLANG_THIN
-scripts/config -e HAVE_GCC_PLUGINS
-%endif
 
 # Unset hostname
 scripts/config -u DEFAULT_HOSTNAME
@@ -1119,136 +990,5 @@ fi
 %files
 
 %changelog
-* Sat Jan 24 2026 LionHeartP <LionHeartP@proton.me> - 6.18.7-200
-- Update to 6.18.7
-- Remove elgato patch (upstreamed)
-
-* Sun Jan 18 2026 LionHeartP <LionHeartP@proton.me> - 6.18.6-200
-- Update to 6.18.6
-- Add patch for Elgato USB speed
-
-* Mon Jan 12 2026 LionHeartP <LionHeartP@proton.me> - 6.18.5-200
-- Update to 6.18.5
-
-* Fri Jan 09 2026 LionHeartP <LionHeartP@proton.me> - 6.18.4-200
-- Update to 6.18.4
-- Update linux-surface.patch and config 
-
-* Sun Jan 04 2026 LionHeartP <LionHeartP@proton.me> - 6.18.3-201
-- Update CachyOS patches
-
-* Fri Jan 02 2026 LionHeartP <LionHeartP@proton.me> - 6.18.3-200
-- Update to 6.18.3
-
-* Thu Dec 18 2025 LionHeartP <LionHeartP@proton.me> - 6.18.2-200
-- Update to 6.18.2
-
-* Sat Dec 13 2025 LionHeartP <LionHeartP@proton.me> - 6.18.1-200
-- Update to 6.18.1
-
-* Fri Dec 12 2025 LionHeartP <LionHeartP@proton.me> - 6.17.12-200
-- Update to 6.17.12
-- Add 0001-amdgpu-Add-CH7218-PCON-to-the-VRR-whitelist.patch
-
-* Sun Dec 07 2025 LionHeartP <LionHeartP@proton.me> - 6.17.11-200
-- Update to 6.17.11
-
-* Mon Dec 01 2025 LionHeartP <LionHeartP@proton.me> - 6.17.10-200
-- Update to 6.17.10
-
-* Mon Nov 24 2025 LionHeartP <LionHeartP@proton.me> - 6.17.9-200
-- Update to 6.17.9
-
-* Fri Nov 14 2025 LionHeartP <LionHeartP@proton.me> - 6.17.8-200
-- Update to 6.17.8
-
-* Sun Nov 02 2025 LionHeartP <LionHeartP@proton.me> - 6.17.7-200
-- Update to 6.17.7
-
-* Fri Oct 31 2025 LionHeartP <LionHeartP@proton.me> - 6.17.6-200
-- Update to 6.17.6
-
-* Sat Oct 25 2025 LionHeartP <LionHeartP@proton.me> - 6.17.5-200
-- Update to 6.17.5
-
-* Mon Oct 20 2025 LionHeartP <LionHeartP@proton.me> - 6.17.4-201
-- Update cachy patch
-
-* Mon Oct 20 2025 LionHeartP <LionHeartP@proton.me> - 6.17.4-200
-- Update to 6.17.4
-
-* Wed Oct 15 2025 LionHeartP <LionHeartP@proton.me> - 6.17.3-201
-- Update Cachy patches for vmd regression fix
-
-* Wed Oct 15 2025 LionHeartP <LionHeartP@proton.me> - 6.17.3-200
-- Update to 6.17.3
-
-* Mon Oct 13 2025 LionHeartP <LionHeartP@proton.me> - 6.17.2-200
-- Update to 6.17.2
-
-* Mon Oct 06 2025 LionHeartP <LionHeartP@proton.me> - 6.17.1-200
-- Update to 6.17.1
-
-* Tue Sep 30 2025 LionHeartP <LionHeartP@proton.me> - 6.17.0-201
-- Revert BORE to 6.5.2
-
-* Tue Sep 30 2025 LionHeartP <LionHeartP@proton.me> - 6.17.0-200
-- Update to 6.17.0
-- Remove asus-linux and ayaneo-headset-fix patches (upstreamed)
-
-* Thu Sep 25 2025 LionHeartP <LionHeartP@proton.me> - 6.16.9-200
-- Update to 6.16.9
-
-* Sat Sep 20 2025 LionHeartP <LionHeartP@proton.me> - 6.16.8-200
-- Update to 6.16.8
-
-* Fri Sep 12 2025 LionHeartP <LionHeartP@proton.me> - 6.16.7-200
-- Update to 6.16.7
-
-* Tue Sep 09 2025 LionHeartP <LionHeartP@proton.me> - 6.16.6-200
-- Update to 6.16.6
-
-* Fri Sep 05 2025 LionHeartP <LionHeartP@proton.me> - 6.16.5-200
-- Update to 6.16.5
-- Rebase ayaneo-headset-fix.patch
-
-* Thu Aug 28 2025 LionHeartP <LionHeartP@proton.me> - 6.16.4-201
-- Update tearing patch via cachy
-
-* Thu Aug 28 2025 LionHeartP <LionHeartP@proton.me> - 6.16.4-200
-- Update to 6.16.4
-- Rebase valve-gamescope-framerate-control-fixups.patch
-
-* Sat Aug 23 2025 LionHeartP <LionHeartP@proton.me> - 6.16.3-201
-- Add ipv4-regression-fix.patch
-- Update config
-
-* Sat Aug 23 2025 LionHeartP <LionHeartP@proton.me> - 6.16.3-200
-- Update to 6.16.3
-
-* Thu Aug 21 2025 LionHeartP <LionHeartP@proton.me> - 6.16.2-200
-- Update to 6.16.2
-
-* Tue Aug 19 2025 LionHeartP <LionHeartP@proton.me> - 6.16.1-202
-- Update and enable linux-surface.patch
-
-* Sat Aug 16 2025 LionHeartP <LionHeartP@proton.me> - 6.16.1-201
-- Update cachyos patches
-
-* Fri Aug 15 2025 LionHeartP <LionHeartP@proton.me> - 6.16.1-200
-- Update to 6.16.1
-- Remove drm-atomic-flip.1.patch, now provided by 0001-cachyos-base-all.patch
-
-* Mon Jul 28 2025 LionHeartP <LionHeartP@proton.me> - 6.16.0-200
-- Update to 6.16.0
-- Update drm-atomic-flip.1.patch with patch from LKML
-  https://lore.kernel.org/amd-gfx/20250723150413.18445-1-xaver.hugl@kde.org/T/#u
-- Remove bmi160_ayaneo.patch (upstreamed)
-- Disable linux-surface.patch until rebase
-
-* Thu Jul 24 2025 LionHeartP <LionHeartP@proton.me> - 6.15.8-200
-- Update to 6.15.8
-
-* Fri Jul 18 2025 LionHeartP <LionHeartP@proton.me> - 6.15.7-200
-- Update to 6.15.7
-- Start keeping changelog entries
+* Sun Feb 8 2026 Bouke Haarmsa (bouhaa)
+- fooling around with Nobara spec file
