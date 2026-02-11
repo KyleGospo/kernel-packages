@@ -63,7 +63,7 @@ jobs:
                   # Set environment variables for PKGBUILD
                   export OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
                   export REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
-                  
+
                   su build bash -c "cd /home/build/linux/arch && OGC_VERSION='$OGC_VERSION' REPO_OWNER='$REPO_OWNER' MAKEFLAGS=-j$(nproc) makepkg --skippgpcheck"
                   . /home/build/linux/arch/PKGBUILD
                   full_version=${pkgver}-${pkgrel}
