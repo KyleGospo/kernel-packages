@@ -2,6 +2,15 @@ name: Build (ubuntu)
 
 on:
     workflow_dispatch:
+        inputs:
+            ogc_version:
+                description: 'OGC kernel version (e.g., v6.18.7-ogc2)'
+                required: false
+                default: 'v6.18.7-ogc2'
+            repo_owner:
+                description: 'Repository owner for linux source'
+                required: false
+                default: 'OpenGamingCollective'
     push:
 
 jobs:
@@ -38,14 +47,27 @@ jobs:
                   apt-get install -y libunwind-dev libpfm4-dev coccinelle openjdk-17-jdk libcapstone-dev libbabeltrace-dev systemtap-sdt-dev libzstd-dev dwarves zstd libbfd-dev libperl-dev libssl-dev
             - name: Get sources
               run: |
-                  wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.7.tar.xz
-                  wget https://github.com/BoukeHaarsma23/linux-ogc/releases/download/v6.18.7-ogc2/monolithic.patch
-                  tar -xf linux-6.18.7.tar.xz
-                  cd linux-6.18.7
+                  # Use inputs if available (workflow_dispatch), otherwise use defaults
+                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
+                  REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
+                  
+                  # Extract kernel version from OGC version (e.g., v6.18.7-ogc2 -> 6.18.7)
+                  KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
+                  
+                  wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz
+                  wget https://github.com/${REPO_OWNER}/linux/releases/download/${OGC_VERSION}/monolithic.patch
+                  tar -xf linux-${KERNEL_VERSION}.tar.xz
+                  cd linux-${KERNEL_VERSION}
                   cp ../config .config
                   patch -Np1 < "../monolithic.patch"
             - name: Build
               run: |
-                  cd linux-6.18.7
+                  # Use inputs if available (workflow_dispatch), otherwise use defaults
+                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
+                  
+                  # Extract kernel version from OGC version (e.g., v6.18.7-ogc2 -> 6.18.7)
+                  KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
+                  
+                  cd linux-${KERNEL_VERSION}
                   make olddefconfig
                   fakeroot make -j$(nproc) bindeb-pkg

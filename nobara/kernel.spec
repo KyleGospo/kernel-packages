@@ -79,8 +79,12 @@ Source2: kvm_stat.logrotate
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch:    %{ix86}
 
+# Default values if not provided via --define
+%{!?ogc_version: %define ogc_version v6.18.7-ogc2}
+%{!?repo_owner: %define repo_owner OpenGamingCollective}
+
 # Stable patches
-Patch0: https://github.com/BoukeHaarsma23/linux-ogc/releases/download/v6.18.7-ogc2/monolithic.patch
+Patch0: https://github.com/%{repo_owner}/linux/releases/download/%{ogc_version}/monolithic.patch
 
 %define __spec_install_post /usr/lib/rpm/brp-compress || :
 %define debug_package %{nil}
