@@ -4,14 +4,8 @@ on:
     workflow_dispatch:
         inputs:
             ogc_version:
-                description: 'OGC kernel version (e.g., v6.18.7-ogc2)'
-                required: false
-                default: 'v6.18.7-ogc2'
-            repo_owner:
-                description: 'Repository owner for linux source'
-                required: false
-                default: 'OpenGamingCollective'
-    push:
+                description: 'Enter a released OGC kernel patch version in the format <kernel-version>-ogc<rev>'
+                required: true
 
 jobs:
     build-deb:
@@ -47,11 +41,11 @@ jobs:
                   apt-get install -y libunwind-dev libpfm4-dev coccinelle openjdk-17-jdk libcapstone-dev libbabeltrace-dev systemtap-sdt-dev libzstd-dev dwarves zstd libbfd-dev libperl-dev libssl-dev
             - name: Get sources
               run: |
-                  # Use inputs if available (workflow_dispatch), otherwise use defaults
-                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
-                  REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
+                  # Grab input patch version from event
+                  OGC_VERSION="${{ github.event.inputs.ogc_version }}"
+                  REPO_OWNER="${{ github.repository_owner }}"
 
-                  # Extract kernel version from OGC version (e.g., v6.18.7-ogc2 -> 6.18.7)
+                  # Extract base kernel version from OGC version
                   KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
 
                   wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz

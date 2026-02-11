@@ -1,8 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
-# Allow overriding via environment variables
-_ogc_version=${OGC_VERSION:-v6.18.7-ogc2}
-_repo_owner=${REPO_OWNER:-OpenGamingCollective}
+_ogc_version=${OGC_VERSION}
+_repo_owner=${REPO_OWNER}
 
 pkgbase=linux
 pkgver=6.18.7.ogc2
@@ -37,10 +36,10 @@ options=(
   !strip
 )
 _srcname=linux-${pkgver%.*}
-_srctag=${_ogc_version}
+_srctag=v${pkgver%.*}-${pkgver##*.}
 source=(
   https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  https://github.com/${_repo_owner}/linux/releases/download/$_srctag/monolithic.patch{,.sig}
+  $url/linux/releases/download/$_srctag/monolithic.patch{,.sig}
   config  # the main kernel config file
 )
 validpgpkeys=(

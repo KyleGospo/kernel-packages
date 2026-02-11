@@ -4,14 +4,8 @@ on:
     workflow_dispatch:
         inputs:
             ogc_version:
-                description: 'OGC kernel version (e.g., v6.18.7-ogc2)'
-                required: false
-                default: 'v6.18.7-ogc2'
-            repo_owner:
-                description: 'Repository owner for linux source'
-                required: false
-                default: 'OpenGamingCollective'
-    push:
+                description: 'Enter a released OGC kernel patch version in the format <kernel-version>-ogc<rev>'
+                required: true
 
 jobs:
     build-rpm:
@@ -50,7 +44,7 @@ jobs:
                   cp nobara/* $TOPDIR/SOURCES
 
                   # Pass variables directly to rpmbuild
-                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
-                  REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
+                  OGC_VERSION="${{ github.event.inputs.ogc_version }}"
+                  REPO_OWNER="${{ github.repository_owner }}"
 
                   rpmbuild --define "_topdir $TOPDIR" --define "ogc_version $OGC_VERSION" --define "repo_owner $REPO_OWNER" -ba ./nobara/kernel.spec
