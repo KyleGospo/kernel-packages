@@ -2,7 +2,10 @@ name: Build (ubuntu)
 
 on:
     workflow_dispatch:
-    push:
+        inputs:
+            ogc_version:
+                description: 'Enter a released OGC kernel patch version in the format <kernel-version>-ogc<rev>'
+                required: true
 
 jobs:
     build-deb:
@@ -38,14 +41,24 @@ jobs:
                   apt-get install -y libunwind-dev libpfm4-dev coccinelle openjdk-17-jdk libcapstone-dev libbabeltrace-dev systemtap-sdt-dev libzstd-dev dwarves zstd libbfd-dev libperl-dev libssl-dev
             - name: Get sources
               run: |
-                  wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.7.tar.xz
-                  wget https://github.com/BoukeHaarsma23/linux-ogc/releases/download/v6.18.7-ogc2/monolithic.patch
-                  tar -xf linux-6.18.7.tar.xz
-                  cd linux-6.18.7
+                  # Grab input patch version from event
+                  OGC_VERSION="${{ github.event.inputs.ogc_version }}"
+                  REPO_OWNER="${{ github.repository_owner }}"
+
+                  # Extract base kernel version from OGC version
+                  KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
+
+                  wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz
+                  wget https://github.com/${REPO_OWNER}/linux/releases/download/${OGC_VERSION}/monolithic.patch
+                  tar -xf linux-${KERNEL_VERSION}.tar.xz
+                  cd linux-${KERNEL_VERSION}
                   cp ../config .config
                   patch -Np1 < "../monolithic.patch"
+
+                  # Save kernel version for next step
+                  echo "KERNEL_VERSION=${KERNEL_VERSION}" >> $GITHUB_ENV
             - name: Build
               run: |
-                  cd linux-6.18.7
+                  cd linux-${KERNEL_VERSION}
                   make olddefconfig
                   fakeroot make -j$(nproc) bindeb-pkg

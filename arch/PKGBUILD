@@ -1,10 +1,13 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
+_ogc_version=${OGC_VERSION}
+_repo_owner=${REPO_OWNER}
+
 pkgbase=linux
 pkgver=6.18.7.ogc2
 pkgrel=1
 pkgdesc='Linux'
-url='https://github.com/BoukeHaarsma23/linux-ogc'
+url="https://github.com/${_repo_owner}/linux"
 arch=(x86_64)
 license=(GPL-2.0-only)
 makedepends=(
@@ -36,7 +39,7 @@ _srcname=linux-${pkgver%.*}
 _srctag=v${pkgver%.*}-${pkgver##*.}
 source=(
   https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  $url/releases/download/$_srctag/monolithic.patch{,.sig}
+  $url/linux/releases/download/$_srctag/monolithic.patch{,.sig}
   config  # the main kernel config file
 )
 validpgpkeys=(

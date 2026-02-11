@@ -2,7 +2,10 @@ name: Build (Nobara)
 
 on:
     workflow_dispatch:
-    push:
+        inputs:
+            ogc_version:
+                description: 'Enter a released OGC kernel patch version in the format <kernel-version>-ogc<rev>'
+                required: true
 
 jobs:
     build-rpm:
@@ -40,4 +43,8 @@ jobs:
                   mkdir -p "$TOPDIR"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
                   cp nobara/* $TOPDIR/SOURCES
 
-                  rpmbuild --define "_topdir $TOPDIR" -ba ./nobara/kernel.spec
+                  # Pass variables directly to rpmbuild
+                  OGC_VERSION="${{ github.event.inputs.ogc_version }}"
+                  REPO_OWNER="${{ github.repository_owner }}"
+
+                  rpmbuild --define "_topdir $TOPDIR" --define "ogc_version $OGC_VERSION" --define "repo_owner $REPO_OWNER" -ba ./nobara/kernel.spec

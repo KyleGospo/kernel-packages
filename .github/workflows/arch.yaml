@@ -2,7 +2,10 @@ name: Build (arch)
 
 on:
     workflow_dispatch:
-    push:
+        inputs:
+            ogc_version:
+                description: 'Enter a released OGC kernel patch version in the format <kernel-version>-ogc<rev>'
+                required: true
 
 jobs:
     build-arch:
@@ -51,7 +54,11 @@ jobs:
               id: build-kernel-package
               shell: bash
               run: |
-                  su build bash -c "cd /home/build/linux/arch && MAKEFLAGS=-j$(nproc) makepkg --skippgpcheck"
+                  # Set environment variables for PKGBUILD
+                  export OGC_VERSION="${{ github.event.inputs.ogc_version }}"
+                  export REPO_OWNER="${{ github.repository_owner }}"
+
+                  su build bash -c "cd /home/build/linux/arch && OGC_VERSION='$OGC_VERSION' REPO_OWNER='$REPO_OWNER' MAKEFLAGS=-j$(nproc) makepkg --skippgpcheck"
                   . /home/build/linux/arch/PKGBUILD
                   full_version=${pkgver}-${pkgrel}
                   echo "full_version=$full_version" >> "$GITHUB_OUTPUT"
