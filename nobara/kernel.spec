@@ -37,8 +37,10 @@
 Name: kernel
 Summary: The Linux Kernel with Open Gaming Collective (OGC) patches
 
-%define _basekver 6.18
-%define _stablekver 7
+# Extract kernel version from OGC tag
+%global _basekver %(echo %{ogc_version} | cut -d. -f1-2)
+%global _stablekver %(echo %{ogc_version} | cut -d. -f3 | sed 's/[^0-9].*//')
+
 %define _rcver rc7
 %if %{_stablekver} == 0
 %define _tarkver %{_basekver}

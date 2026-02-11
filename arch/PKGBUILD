@@ -3,8 +3,12 @@
 _ogc_version=${OGC_VERSION}
 _repo_owner=${REPO_OWNER}
 
-pkgbase=linux
-pkgver=6.18.7.ogc2
+pkgver=${_ogc_version}
+_upstream_ver=${_ogc_version#v}
+_upstream_ver=${_upstream_ver%%-*}
+_srcname=linux-${_upstream_ver}
+_srctag=v${pkgver}
+
 pkgrel=1
 pkgdesc='Linux'
 url="https://github.com/${_repo_owner}/linux"
@@ -35,12 +39,11 @@ options=(
   !debug
   !strip
 )
-_srcname=linux-${pkgver%.*}
-_srctag=v${pkgver%.*}-${pkgver##*.}
+
 source=(
-  https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  $url/linux/releases/download/$_srctag/monolithic.patch{,.sig}
-  config  # the main kernel config file
+  https://cdn.kernel.org/pub/linux/kernel/v${_upstream_ver%%.*}.x/${_srcname}.tar.{xz,sign}
+  $url/releases/download/$_srctag/monolithic.patch{,.sig}
+  config
 )
 validpgpkeys=(
   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
