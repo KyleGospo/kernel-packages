@@ -49,8 +49,8 @@ jobs:
                   mkdir -p "$TOPDIR"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
                   cp nobara/* $TOPDIR/SOURCES
 
-                  # Set environment variables for the spec file
-                  export OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
-                  export REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
+                  # Pass variables directly to rpmbuild
+                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
+                  REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
 
                   rpmbuild --define "_topdir $TOPDIR" --define "ogc_version $OGC_VERSION" --define "repo_owner $REPO_OWNER" -ba ./nobara/kernel.spec

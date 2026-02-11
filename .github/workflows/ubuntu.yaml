@@ -50,24 +50,21 @@ jobs:
                   # Use inputs if available (workflow_dispatch), otherwise use defaults
                   OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
                   REPO_OWNER="${{ github.event.inputs.repo_owner || github.repository_owner }}"
-                  
+
                   # Extract kernel version from OGC version (e.g., v6.18.7-ogc2 -> 6.18.7)
                   KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
-                  
+
                   wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KERNEL_VERSION}.tar.xz
                   wget https://github.com/${REPO_OWNER}/linux/releases/download/${OGC_VERSION}/monolithic.patch
                   tar -xf linux-${KERNEL_VERSION}.tar.xz
                   cd linux-${KERNEL_VERSION}
                   cp ../config .config
                   patch -Np1 < "../monolithic.patch"
+
+                  # Save kernel version for next step
+                  echo "KERNEL_VERSION=${KERNEL_VERSION}" >> $GITHUB_ENV
             - name: Build
               run: |
-                  # Use inputs if available (workflow_dispatch), otherwise use defaults
-                  OGC_VERSION="${{ github.event.inputs.ogc_version || 'v6.18.7-ogc2' }}"
-                  
-                  # Extract kernel version from OGC version (e.g., v6.18.7-ogc2 -> 6.18.7)
-                  KERNEL_VERSION=$(echo "$OGC_VERSION" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
-                  
                   cd linux-${KERNEL_VERSION}
                   make olddefconfig
                   fakeroot make -j$(nproc) bindeb-pkg
