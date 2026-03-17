@@ -152,8 +152,6 @@ Requires: %{name}-modules-%{rpmver} = %{kverstr}
 Provides: %{name}%{_basekver} = %{rpmver}
 Provides: kernel-uki-vert = %{rpmver}
 Obsoletes: kernel <= %{rpmverobsolete}
-# v4l2loopback module is provided by cachy-base-all patch
-Obsoletes: akmod-v4l2loopback
 
 %description
 The kernel-%{flavor} meta package
