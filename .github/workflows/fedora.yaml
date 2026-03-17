@@ -1,4 +1,4 @@
-name: Build (Nobara)
+name: Build (Fedora)
 
 on:
     workflow_dispatch:
@@ -11,7 +11,7 @@ on:
             - 'v*'
 
 env:
-    OCI_REPO: ghcr.io/${{ github.repository }}-nobara
+    OCI_REPO: ghcr.io/${{ github.repository }}-fedora
 
 permissions:
     contents: read
@@ -60,7 +60,7 @@ jobs:
 
             - name: Dependencies
               run: |
-                  dnf -y builddep nobara/kernel.spec
+                  dnf -y builddep fedora/kernel.spec
                   dnf -y install jq
 
             - name: build
@@ -68,9 +68,9 @@ jobs:
                   TOPDIR="$(pwd)/rpmbuild"
 
                   mkdir -p "$TOPDIR"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-                  cp nobara/* $TOPDIR/SOURCES
+                  cp fedora/* $TOPDIR/SOURCES
 
-                  rpmbuild --define "_topdir $TOPDIR" -ba ./nobara/kernel.spec
+                  rpmbuild --define "_topdir $TOPDIR" -ba ./fedora/kernel.spec
 
             - name: Get OGC version
               if: startsWith(github.ref, 'refs/tags/')
