@@ -61,7 +61,11 @@ jobs:
             - name: Dependencies
               run: |
                   dnf -y builddep fedora/kernel.spec
-                  dnf -y install jq
+                  dnf -y install jq sed
+
+            - name: Configure SELinux as default LSM
+              run: |
+                  sed -i 's/^CONFIG_LSM=.*/CONFIG_LSM="landlock,lockdown,yama,integrity,selinux,bpf"/' config
 
             - name: build
               run: |

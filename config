@@ -11600,9 +11600,9 @@ CONFIG_INTEGRITY_AUDIT=y
 CONFIG_DEFAULT_SECURITY_SELINUX=y
 # CONFIG_DEFAULT_SECURITY_SMACK is not set
 # CONFIG_DEFAULT_SECURITY_TOMOYO is not set
-# CONFIG_DEFAULT_SECURITY_APPARMOR is not set
+CONFIG_DEFAULT_SECURITY_APPARMOR=y
 # CONFIG_DEFAULT_SECURITY_DAC is not set
-CONFIG_LSM="landlock,lockdown,yama,integrity,selinux,bpf"
+CONFIG_LSM="landlock,lockdown,yama,integrity,bpf"
 
 #
 # Kernel hardening options

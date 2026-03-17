@@ -73,7 +73,11 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  pacman -Syu --noconfirm bc cpio gettext jq libelf pahole perl python rust rust-bindgen rust-src tar xz graphviz imagemagick python-sphinx python-yaml texlive-latexextra
+                  pacman -Syu --noconfirm bc cpio gettext jq libelf pahole perl python rust rust-bindgen rust-src tar xz graphviz imagemagick python-sphinx python-yaml texlive-latexextra sed
+
+            - name: Configure AppArmor as default LSM
+              run: |
+                  sed -i 's/^CONFIG_LSM=.*/CONFIG_LSM="landlock,lockdown,yama,integrity,apparmor,bpf"/' .config
 
             - name: Build linux package
               id: build-kernel-package
