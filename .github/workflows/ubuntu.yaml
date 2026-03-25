@@ -15,9 +15,6 @@ env:
 
 permissions:
     contents: read
-    packages: write
-    id-token: write
-    attestations: write
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +23,13 @@ concurrency:
 jobs:
     build-deb:
         runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            packages: write
+            id-token: write
+            attestations: write
+            artifact-metadata: write
 
         container:
             image: ubuntu:latest
