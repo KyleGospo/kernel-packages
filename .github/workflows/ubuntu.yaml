@@ -123,7 +123,7 @@ jobs:
             - name: Generate default config
               run: |
                   cd linux-${{ steps.version.outputs.tar_kver }}
-                  make defconfig
+                  make x86_64_defconfig
 
             - name: Configure kernel
               uses: OpenGamingCollective/kernel-configurator@5b4abc58a2edf89941180dbbe33b26415db23b0b # v1.0.1
