@@ -130,10 +130,10 @@ jobs:
               with:
                   config: linux-${{ steps.version.outputs.tar_kver }}/.config
                   set: |
-                      global.config.set
+                      config/ogc.config.set
                       ubuntu/config.set
                   unset: |
-                      global.config.unset
+                      config/ogc.config.unset
                       ubuntu/config.unset
 
             - name: Upload kernel config

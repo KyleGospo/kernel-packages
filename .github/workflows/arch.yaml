@@ -153,10 +153,10 @@ jobs:
               with:
                   config: linux-${{ steps.version.outputs.tar_kver }}/.config
                   set: |
-                      global.config.set
+                      config/ogc.config.set
                       arch/config.set
                   unset: |
-                      global.config.unset
+                      config/ogc.config.unset
                       arch/config.unset
 
             - name: Upload kernel config
